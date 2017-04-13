@@ -7,9 +7,6 @@ License:        GPLv2+
 URL:            https://github.com/axkibe/lsyncd
 Source0:        https://github.com/axkibe/%{name}/archive/release-%{version}.tar.gz#/%{name}-release-%{version}.tar.gz
 
-# https://github.com/axkibe/lsyncd/issues/220
-Patch0:         0001-Sanitize-mv-arguments.patch
-
 Source1:        lsyncd.service
 Source2:        lsyncd.init
 Source3:        lsyncd.sysconfig
@@ -57,7 +54,6 @@ not hamper local file system performance.
 
 %prep
 %setup -q -n %{name}-release-%{version}
-%patch0 -p1
 
 
 %build
