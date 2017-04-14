@@ -61,38 +61,47 @@ not hamper local file system performance.
 
 
 %build
-%if 0%{?rhel}  == 6
-export CFLAGS="$RPM_OPT_FLAGS -fPIE"
-export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
-%endif
+%if 0%{?rhel}  == 7
 %{__mkdir} build
 cd build
 cmake ..
 make %{?_smp_mflags}
-
-%install
-%if 0%{?rhel}  == 7
-%{__install} -p -D -m 0755 build/lsyncd %{buildroot}%{_bindir}/lsyncd
-%{__install} -p -D -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/lsyncd.service
-%{__install} -p -D -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/lsyncd
-%{__install} -p -D -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/lsyncd
-%{__install} -p -D -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/
-%{__install} -p -D -m 0644 doc/manpage/lsyncd.1 %{buildroot}%{_mandir}/man1/lsyncd.1
-mkdir -p %{buildroot}%{_docdir}/lsyncd/examples/
-%{__install} -p -D -m 0644 ChangeLog COPYING %{buildroot}%{_docdir}/lsyncd/
-%{__install} -p -D -m 0644 examples/*.lua %{buildroot}%{_docdir}/lsyncd/examples/
 %endif
 
 %if 0%{?rhel}  == 6
-rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
-install -d 0755 %{buildroot}%{_initrddir} 
-install -p -m 0755 %{SOURCE62} %{buildroot}%{_initrddir}/lsyncd
-install -p -D -m 0644 %{SOURCE63} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
-install -d -m 0755 %{buildroot}%{_localstatedir}/run/%{name}
-install -d -m 0755 %{buildroot}%{_localstatedir}/log/%{name}
-install -p -D -m 0644 %{SOURCE64} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
-install -p -D -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/
+cat <<EOF | scl enable devtoolset-6 -
+export CFLAGS="$RPM_OPT_FLAGS -fPIE"
+export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
+%{__mkdir} build
+cd build
+cmake ..
+make %{?_smp_mflags}
+EOF
+%endif
+
+%install
+%{__rm} -rf %{buildroot}
+%{__install} -p -D -m 0755 build/lsyncd %{buildroot}%{_bindir}/lsyncd
+%{__install} -p -D -m 0644 doc/manpage/lsyncd.1 %{buildroot}%{_mandir}/man1/lsyncd
+%{__install} -d 0755 %{buildroot}%{_docdir}/lsyncd/examples/
+%{__install} -p -D -m 0644 ChangeLog COPYING %{buildroot}%{_docdir}/lsyncd/
+%{__install} -p -D -m 0644 examples/*.lua %{buildroot}%{_docdir}/lsyncd/examples/
+%{__install} -d -m 0755 %{buildroot}%{_localstatedir}/log/%{name}
+
+%if 0%{?rhel}  == 7
+%{__install} -p -D -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
+%{__install} -p -D -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
+%{__install} -p -D -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
+%{__install} -p -D -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/
+%endif
+
+%if 0%{?rhel}  == 6
+%{__install} -d 0755 %{buildroot}%{_initrddir} 
+%{__install} -p -m 0755 %{SOURCE62} %{buildroot}%{_initrddir}/%{name}
+%{__install} -p -D -m 0644 %{SOURCE63} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
+%{__install} -d -m 0755 %{buildroot}%{_localstatedir}/run/%{name}
+%{__install} -p -D -m 0644 %{SOURCE64} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
+%{__install} -p -D -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/
 %endif
 
 %clean
@@ -134,34 +143,38 @@ fi
 
 %files
 %if 0%{?rhel}  == 7
+%defattr(-,root,root,-)
+%{_bindir}/lsyncd
 %doc %{_mandir}/man1/lsyncd.1*
 %doc %{_docdir}/lsyncd/COPYING
 %doc %{_docdir}/lsyncd/ChangeLog
 %doc %{_docdir}/lsyncd/examples/*
-%config(noreplace) %{_sysconfdir}/lsyncd.conf
-%config(noreplace) %{_sysconfdir}/sysconfig/lsyncd
-%config(noreplace) %{_sysconfdir}/logrotate.d/lsyncd
-%{_bindir}/lsyncd
+%config(noreplace) %{_sysconfdir}/%{name}.conf
+%config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %{_unitdir}/lsyncd.service
+%dir %{_localstatedir}/run/%{name}
+%dir %{_localstatedir}/log/%{name}
+%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %endif
 
 %if 0%{?rhel}  == 6
 %defattr(-,root,root,-)
-%{_mandir}/man1/lsyncd.1*
-%doc COPYING ChangeLog examples
+%{_bindir}/lsyncd
+%doc %{_mandir}/man1/lsyncd.gz
+%doc %{_docdir}/lsyncd/COPYING
+%doc %{_docdir}/lsyncd/ChangeLog
+%doc %{_docdir}/lsyncd/examples/*
 %config(noreplace) %{_sysconfdir}/%{name}.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %attr(0755,root,root) %{_initrddir}/%{name}
 %dir %{_localstatedir}/run/%{name}
 %dir %{_localstatedir}/log/%{name}
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
-%{_bindir}/lsyncd
-%exclude %{_docdir}/lsyncd
 %endif
 
 
 %changelog
-* Thu Apr 13 2017 Hiroaki Nakamura <hnakamur@gmail.com> - 2.2.2-1
+* Fri Apr 14 2017 Hiroaki Nakamura <hnakamur@gmail.com> - 2.2.2-1
 - Update lsyncd to 2.2.2
 - Merge spec files from lsyncd-2.1.5-6.el7.src.rpm and
   lsyncd-2.1.5-0.el6.src.rpm
