@@ -19,6 +19,8 @@ Source63:       lsyncd.sysconfig.el6
 Source64:       lsyncd.logrotate.el6
 
 %if 0%{?rhel}  == 7
+BuildRequires:  cmake
+BuildRequires:  gcc-c++
 BuildRequires:  lua-devel >= 5.1.3
 BuildRequires:  asciidoc
 Requires: lua
@@ -30,6 +32,8 @@ Requires(postun): systemd
 %endif
 
 %if 0%{?rhel}  == 6
+BuildRequires:  cmake
+BuildRequires:  gcc-c++
 BuildRequires:  lua-devel >= 5.1.3
 BuildRequires:  asciidoc
 Requires: lua
@@ -61,16 +65,22 @@ not hamper local file system performance.
 export CFLAGS="$RPM_OPT_FLAGS -fPIE"
 export LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 %endif
-%configure
+%{__mkdir} build
+cd build
+cmake ..
 make %{?_smp_mflags}
 
 %install
 %if 0%{?rhel}  == 7
-make install DESTDIR=%{buildroot}
-install -p -D -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/lsyncd.service
-install -p -D -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/lsyncd
-install -p -D -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/lsyncd
-install -p -D -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/
+%{__install} -p -D -m 0755 build/lsyncd %{buildroot}%{_bindir}/lsyncd
+%{__install} -p -D -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/lsyncd.service
+%{__install} -p -D -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/lsyncd
+%{__install} -p -D -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/lsyncd
+%{__install} -p -D -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/
+%{__install} -p -D -m 0644 doc/manpage/lsyncd.1 %{buildroot}%{_mandir}/man1/lsyncd.1
+mkdir -p %{buildroot}%{_docdir}/lsyncd/examples/
+%{__install} -p -D -m 0644 ChangeLog COPYING %{buildroot}%{_docdir}/lsyncd/
+%{__install} -p -D -m 0644 examples/*.lua %{buildroot}%{_docdir}/lsyncd/examples/
 %endif
 
 %if 0%{?rhel}  == 6
@@ -125,13 +135,14 @@ fi
 %files
 %if 0%{?rhel}  == 7
 %doc %{_mandir}/man1/lsyncd.1*
-%doc COPYING ChangeLog examples
+%doc %{_docdir}/lsyncd/COPYING
+%doc %{_docdir}/lsyncd/ChangeLog
+%doc %{_docdir}/lsyncd/examples/*
 %config(noreplace) %{_sysconfdir}/lsyncd.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/lsyncd
 %config(noreplace) %{_sysconfdir}/logrotate.d/lsyncd
 %{_bindir}/lsyncd
 %{_unitdir}/lsyncd.service
-%exclude %{_docdir}/lsyncd
 %endif
 
 %if 0%{?rhel}  == 6
