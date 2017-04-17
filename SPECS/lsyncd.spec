@@ -33,7 +33,7 @@ Requires(postun): systemd
 
 %if 0%{?rhel}  == 6
 BuildRequires:  cmake
-BuildRequires:  gcc-c++
+BuildRequires:  devtoolset-6-gcc-c++
 BuildRequires:  lua-devel >= 5.1.3
 BuildRequires:  asciidoc
 Requires: lua
