@@ -1,7 +1,7 @@
 lsyncd-rpm
 ==========
 
-A Dockerfile to build [axkibe/lsyncd: Lsyncd (Live Syncing Daemon) synchronizes local directories with remote targets](https://github.com/axkibe/lsyncd) rpm for CentOS 6 and 7 using [fedora copr](https://copr.fedoraproject.org/).
+A Dockerfile to build [axkibe/lsyncd: Lsyncd (Live Syncing Daemon) synchronizes local directories with remote targets](https://github.com/axkibe/lsyncd) rpm for CentOS 7 using [fedora copr](https://copr.fedoraproject.org/).
 
 ## Setup
 

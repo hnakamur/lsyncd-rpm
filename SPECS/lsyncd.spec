@@ -1,3 +1,6 @@
+# NOTE: Currently only el7 is supported.
+# TODO: Add support for el6.
+
 Name:           lsyncd
 Version:        2.2.2
 Release:        1%{?dist}
