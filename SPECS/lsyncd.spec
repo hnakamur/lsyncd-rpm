@@ -90,6 +90,7 @@ EOF
 %{__install} -p -D -m 0644 ChangeLog COPYING %{buildroot}%{_docdir}/lsyncd/
 %{__install} -p -D -m 0644 examples/*.lua %{buildroot}%{_docdir}/lsyncd/examples/
 %{__install} -d -m 0755 %{buildroot}%{_localstatedir}/log/%{name}
+%{__install} -d -m 0755 %{buildroot}%{_localstatedir}/run/%{name}
 
 %if 0%{?rhel}  == 7
 %{__install} -p -D -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
@@ -102,7 +103,6 @@ EOF
 %{__install} -d 0755 %{buildroot}%{_initrddir} 
 %{__install} -p -m 0755 %{SOURCE62} %{buildroot}%{_initrddir}/%{name}
 %{__install} -p -D -m 0644 %{SOURCE63} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
-%{__install} -d -m 0755 %{buildroot}%{_localstatedir}/run/%{name}
 %{__install} -p -D -m 0644 %{SOURCE64} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 %{__install} -p -D -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/
 %endif
@@ -148,7 +148,7 @@ fi
 %if 0%{?rhel}  == 7
 %defattr(-,root,root,-)
 %{_bindir}/lsyncd
-%doc %{_mandir}/man1/lsyncd.1*
+%doc %{_mandir}/man1/lsyncd.gz
 %doc %{_docdir}/lsyncd/COPYING
 %doc %{_docdir}/lsyncd/ChangeLog
 %doc %{_docdir}/lsyncd/examples/*
